@@ -44,6 +44,12 @@ export const constantRoutes = [
   },
 
   {
+    path: '/stock/detail',
+    component: () => import('@/views/stock/detail/index'),
+    hidden: true
+  },
+
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
@@ -54,7 +60,28 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
-
+  {
+    path: '/account',
+    component: Layout,
+    redirect: '/account',
+    children: [{
+      path: '/account',
+      name: 'Account',
+      component: () => import('@/views/account/index'),
+      meta: { title: 'Account', icon: 'international' }
+    }]
+  },
+  {
+    path: '/client',
+    component: Layout,
+    redirect: '/client',
+    children: [{
+      path: '/client',
+      name: 'Client',
+      component: () => import('@/views/client/index'),
+      meta: { title: 'Client', icon: 'international' }
+    }]
+  },
   {
     path: '/example',
     component: Layout,

@@ -54,6 +54,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { SunClient } from '@/client/sun_client'
 
 export default {
   name: 'Login',
@@ -123,6 +124,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style lang="scss">

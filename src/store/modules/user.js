@@ -4,7 +4,7 @@ import { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
-  name: '',
+  name: 'lzw',
   avatar: ''
 }
 

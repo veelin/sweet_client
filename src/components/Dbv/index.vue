@@ -1,22 +1,21 @@
 <template>
-  <div class="nbv-contain">
-    <span class="nbv-value">{{formatValue(val.value)}}</span> <span class="nbv-unit">{{val.unit}}</span>
+  <div class="dbv-contain">
+    <span class="dbv-value">{{ formatValue(val) }}</span>
   </div>
 </template>
 
 <script>
-const decimalFormat = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 2, minimumIntegerDigits: 2 })
+const decimalFormat = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 2, minimumFractionDigits: 2 })
 const shortFormat = new Intl.NumberFormat('en-GB', { notation: 'compact' })
 
 export default {
-  name: 'Nbv',
+  name: 'Dbv',
+  components: {
+  },
   props: {
     val: {
-      type: Object,
-      default: {
-        value: 0.0,
-        unit: 'Base'
-      }
+      type: Number,
+      default: 0.00
     },
     format: {
       type: String,
@@ -25,11 +24,7 @@ export default {
   },
   data() {
     return {
-      value: this.val.value,
-      unit: this.val.unit
     }
-  },
-  components: {
   },
   methods: {
     formatValue(num) {
@@ -45,15 +40,9 @@ export default {
 
 </script>
 <style lang="scss" scoped>
-  .nbv-contain {
-    .nbv-value {
+  .dbv-contain {
+    .dbv-value {
 
-    }
-
-    .nbv-unit {
-      line-height: 0.3125rem;
-      font-size: 0.3125rem;
-      color: #409EFF;
     }
   }
 </style>
