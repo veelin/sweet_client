@@ -20,7 +20,7 @@
           <span>卖价</span><span>{{ topMktData.askPrice }} x {{ topMktData.askSize }}</span>
         </el-row>
         <el-row class="stock-exchange-nbv">
-          <span>买价</span><span>{{topMktData.bidPrice }} x {{ topMktData.bidSize }}</span>
+          <span>买价</span><span>{{ topMktData.bidPrice }} x {{ topMktData.bidSize }}</span>
         </el-row>
       </el-col>
       <el-col :span="8">
@@ -31,7 +31,10 @@
       <el-col :span="16">
         <div>
           <el-row style="height: 500px">
-            <candle-stick :id="'candle-stick'" />
+            <candle-stick :id="'candle-stick'" :query-params="queryParams" />
+          </el-row>
+          <el-row style="height: 500px">
+            <realtime-stick :id="'realtime-stick'" />
           </el-row>
           <el-row>
             <el-row type="flex">
@@ -109,12 +112,15 @@
             <el-col />
           </el-row>
         </div>
-        <div />
+        <div>
+          <depth-data />
+        </div>
         <div />
 
       </el-col>
     </el-row>
   </div>
+
 </template>
 
 <script>
@@ -125,11 +131,16 @@ import dbv from '@/components/Dbv'
 import stockName from '@/components/StockName'
 import store from '@/store'
 import CandleStick from '@/components/Chart/CandleStick'
+import RealtimeStick from '@/components/Chart/RealtimeStick'
+import DepthData from '@/components/DepthData'
 
 import { EventEnum } from '@/core/channel/event/EventEnum'
+import { BarSizeEnum } from '@/core/channel/enums/mktdata/BarSizeEnum'
+import { WhatToShowEnum } from '@/core/channel/enums/mktdata/WhatToShowEnum'
 import { PageCancelSubscribeCommand } from '@/core/channel/dto/page/subscribe/command/PageCancelSubscribeCommand'
 import { PageSubscribeCommand } from '@/core/channel/dto/page/subscribe/command/PageSubscribeCommand'
 
+var subscribeEventSets = new Set()
 const subscribeEvent = [EventEnum.accountData, EventEnum.positionData, EventEnum.accountPnlData, EventEnum.singlePnlData, EventEnum.contractDetailData, EventEnum.topMktData, EventEnum.historicalMktData]
 export default {
   name: 'Dashboard',
@@ -137,24 +148,32 @@ export default {
     dbv,
     nbv,
     stockName,
-    CandleStick
+    CandleStick,
+    RealtimeStick,
+    DepthData
   },
 
   data() {
-    return {}
+    return {
+      queryParams: {
+        barSize: BarSizeEnum._30_secs,
+        whatToShows: [WhatToShowEnum.TRADES]
+      }
+    }
   },
   created() {
-    this.symbol = this.$route.query.symbol
-    store.dispatch('contract/contractSymbol', this.symbol)
-    store.dispatch('top_mktdata/topMktDataSymbol', this.symbol)
-    store.dispatch('account/symbolSignal', this.symbol)
+    this.conId = parseInt(this.$route.query.conId)
+    store.dispatch('contract/contractConId', this.conId)
+    store.dispatch('top_mktdata/topMktDataConId', this.conId)
+    store.dispatch('account/conIdSignal', this.conId)
+    subscribeEvent.forEach((e) => subscribeEventSets.add({ 'action': e }))
     const sendMessage = new PageSubscribeCommand()
-    sendMessage.actions = subscribeEvent
+    sendMessage.actions = Array.from(subscribeEventSets)
     this.sunClient.send(JSON.stringify(sendMessage))
   },
   beforeDestroy() {
     const sendMessage = new PageCancelSubscribeCommand()
-    sendMessage.actions = subscribeEvent
+    sendMessage.actions = Array.from(subscribeEventSets)
     this.sunClient.send(JSON.stringify(sendMessage))
   },
   computed: {

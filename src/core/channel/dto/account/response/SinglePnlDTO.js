@@ -8,5 +8,6 @@ export class SinglePnlDTO {
     conId = 0
     dailyPnL = new Nbv()
     value = new Nbv()
+    account = null
     reqId = 0
 }

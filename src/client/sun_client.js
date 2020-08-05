@@ -145,6 +145,24 @@ export class SunClient {
       case 'topMktData':
         store.dispatch('top_mktdata/topMktDataDetail', message)
         break
+      case 'historicalMktData':
+        store.dispatch('historical_mktdata/historicalMktData', message)
+        break
+      case 'incrementalHistoricalMktData':
+        store.dispatch('historical_mktdata/incrementalHistoricalMktData', message)
+        break
+      case 'tickMktData':
+        store.dispatch('top_mktdata/tickMktData', message)
+        break
+      case 'incrementalTickMktData':
+        store.dispatch('top_mktdata/incrementalTickMktData', message)
+        break
+      case 'depthData':
+        store.dispatch('depth_data/depthData', message)
+        break
+      case 'updateDepthData':
+        store.dispatch('depth_data/updateDepthData', message)
+        break
     }
   }
 }

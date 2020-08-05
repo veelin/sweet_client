@@ -1,7 +1,9 @@
 
 export class HistoricalDataDTO {
-    symbol = null
-    action = 'historicalMktData'
+    barSize = null
     headTimestamp = null
+    action = 'historicalMktData'
+    conId = null
+    whatToShow = null
     bars = []
 }

@@ -2,19 +2,20 @@ import { ContractDetailDTO } from '@/core/channel/dto/contract/response/Contract
 
 const state = {
   contractMap: new Map(),
-  symbol: null,
+  conId: null,
   contract: new ContractDetailDTO()
 }
 
 const mutations = {
   CONTRACT_DETAIL: (state, data) => {
-    state.contractMap.set(data.contract.symbol, data)
-    if (state.symbol === data.contract.symbol) {
+    console.log(data)
+    state.contractMap.set(data.contract.conId, data)
+    if (state.conId === data.contract.conId) {
       state.contract = data
     }
   },
-  CONTRACT_SYMBOL: (state, data) => {
-    state.symbol = data
+  CONTRACT_CONID: (state, data) => {
+    state.conId = data
   }
 }
 
@@ -22,8 +23,8 @@ const actions = {
   contractDetail({ commit }, data) {
     commit('CONTRACT_DETAIL', data)
   },
-  contractSymbol({ commit }, data) {
-    commit('CONTRACT_SYMBOL', data)
+  contractConId({ commit }, data) {
+    commit('CONTRACT_CONID', data)
   }
 }
 

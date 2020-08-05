@@ -13,6 +13,7 @@ export class TopMktDataDTO {
     delayedBid = 0.0
     action = 'topMktData'
     creditmanMarkPrice = 0.0
+    conId = 0
     futuresOpenInterest = 0
     shortTermVolume5Min = 0
     askSize = 0

@@ -2,6 +2,7 @@ import { Nbv } from '@/core/channel/dto/Nbv'
 
 export class AccountDTO {
     fundValue = new Nbv()
+    lastUpdateDate = null
     optionMarketValue = new Nbv()
     grossPositionValue = new Nbv()
     accruedCash = new Nbv()

@@ -10,7 +10,7 @@ const state = {
   singlePnlMap: new Map(),
   position: new PositionDTO(),
   singlePnl: new SinglePnlDTO(),
-  symbol: ''
+  conId: ''
 }
 
 const mutations = {
@@ -18,8 +18,8 @@ const mutations = {
     state.accountDTO = data
   },
   UPDATE_PORTFOLIO: (state, data) => {
-    state.portfolioMap.set(data.contract.symbol, data)
-    if (data.contract.symbol === state.symbol) {
+    state.portfolioMap.set(data.contract.conId, data)
+    if (data.contract.conId === state.conId) {
       state.position = data
     }
   },
@@ -32,8 +32,8 @@ const mutations = {
       state.singlePnl = data
     }
   },
-  SYMBOL_SIGNAL: (state, data) => {
-    state.symbol = data
+  CONID_SIGNAL: (state, data) => {
+    state.conId = data
   }
 }
 
@@ -50,8 +50,8 @@ const actions = {
   updateSinglePnl({ commit }, data) {
     commit('UPDATE_SINGLE_PNL', data)
   },
-  symbolSignal({ commit }, data) {
-    commit('SYMBOL_SIGNAL', data)
+  conIdSignal({ commit }, data) {
+    commit('CONID_SIGNAL', data)
   }
 }
 

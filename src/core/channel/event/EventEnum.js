@@ -5,6 +5,11 @@ export const EventEnum = {
   singlePnlData: 'singlePnlData',
   contractDetailData: 'contractDetailData',
   topMktData: 'topMktData',
-  historicalMktData: 'historicalMktData'
+  historicalMktData: 'historicalMktData',
+  incrementalHistoricalMktData: 'incrementalHistoricalMktData',
+  tickMktData: 'tickMktData',
+  incrementalTopMktData: 'incrementalTickMktData',
+  depthData: 'depthData',
+  updateDepthData: 'updateDepthData'
 }
 

@@ -1,0 +1,20 @@
+export const BarSizeEnum = {
+  _1_secs: '1 secs',
+  _5_secs: '5 secs',
+  _10_secs: '10 secs',
+  _15_secs: '15 secs',
+  _30_secs: '30 secs',
+  _1_min: '1 min',
+  _2_mins: '2 mins',
+  _3_mins: '3 mins',
+  _5_mins: '5 mins',
+  _10_mins: '10 mins',
+  _15_mins: '15 mins',
+  _20_mins: '20 mins',
+  _30_mins: '30 mins',
+  _1_hour: '1 hour',
+  _4_hours: '4 hours',
+  _1_day: '1 day',
+  _1_week: '1 week',
+  _1_month: '1 month'
+}

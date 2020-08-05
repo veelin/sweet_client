@@ -239,7 +239,7 @@
           <div v-for="position in portfolioMap">
             <el-row type="flex" justify="space-between">
               <el-col :span="8">
-                <div><span><router-link target="_blank" :to="{path:'/stock/detail',query:{symbol:position[1].contract.symbol}}">{{ position[1].contract.symbol }}</router-link></span><span> {{ getContractName(contractMap.get(position[1].contract.symbol)) }}</span> <span> {{ position[1].contract.exchange }}</span></div>
+                <div><span><router-link target="_blank" :to="{path:'/stock/detail',query:{conId:position[1].contract.conId}}">{{ position[1].contract.symbol }}</router-link></span><span> {{ getContractName(contractMap.get(position[1].contract.conId)) }}</span> <span> {{ position[1].contract.exchange }}</span></div>
                 <div />
               </el-col>
               <el-col :span="2">{{ position[1].position }}</el-col>
@@ -273,7 +273,8 @@ import { EventEnum } from '@/core/channel/event/EventEnum'
 import { PageCancelSubscribeCommand } from '@/core/channel/dto/page/subscribe/command/PageCancelSubscribeCommand'
 import { PageSubscribeCommand } from '@/core/channel/dto/page/subscribe/command/PageSubscribeCommand'
 
-const subscribeEvent = [EventEnum.accountData, EventEnum.positionData, EventEnum.accountPnlData, EventEnum.singlePnlData, EventEnum.contractDetailData, EventEnum.mktData]
+var subscribeEventSets = new Set()
+const subscribeEvent = [EventEnum.accountData, EventEnum.positionData, EventEnum.accountPnlData, EventEnum.singlePnlData, EventEnum.contractDetailData, EventEnum.topMktData]
 export default {
   name: 'Dashboard',
   components: {
@@ -285,13 +286,14 @@ export default {
     return {}
   },
   created() {
+    subscribeEvent.forEach((e) => subscribeEventSets.add({ 'action': e }))
     const sendMessage = new PageSubscribeCommand()
-    sendMessage.actions = subscribeEvent
+    sendMessage.actions = Array.from(subscribeEventSets)
     this.sunClient.send(JSON.stringify(sendMessage))
   },
   beforeDestroy() {
     const sendMessage = new PageCancelSubscribeCommand()
-    sendMessage.actions = subscribeEvent
+    sendMessage.actions = Array.from(subscribeEventSets)
     this.sunClient.send(JSON.stringify(sendMessage))
   },
   computed: {

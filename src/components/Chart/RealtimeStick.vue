@@ -9,16 +9,15 @@ import Highcharts from 'highcharts'
 import stockInit from 'highcharts/modules/stock'
 
 import { mapState } from 'vuex'
+import store from '@/store'
 
 import { EventEnum } from '@/core/channel/event/EventEnum'
-import { BarSizeEnum } from '@/core/channel/enums/mktdata/BarSizeEnum'
-import { WhatToShowEnum } from '@/core/channel/enums/mktdata/WhatToShowEnum'
 
 import { PageCancelSubscribeCommand } from '@/core/channel/dto/page/subscribe/command/PageCancelSubscribeCommand'
 import { PageSubscribeCommand } from '@/core/channel/dto/page/subscribe/command/PageSubscribeCommand'
-import { HistoricalDataCommand } from '@/core/channel/dto/mktdata/command/HistoricalDataCommand'
-
-const subscribeEvent = [EventEnum.historicalMktData, EventEnum.incrementalHistoricalMktData]
+import { TickDataCommand } from '@/core/channel/dto/mktdata/command/TickDataCommand'
+import { TickTypeEnum } from '@/core/channel/enums/mktdata/TickTypeEnum'
+const subscribeEvent = [EventEnum.topMktData, EventEnum.tickMktData, EventEnum.incrementalTopMktData]
 var subscribeEventSet = new Set()
 
 stockInit(Highcharts)
@@ -40,15 +39,6 @@ export default {
       default: function() {
         return ''
       }
-    },
-    queryParams: {
-      type: Object,
-      default: function() {
-        return {
-          barSize: BarSizeEnum._1_day,
-          whatToShows: [WhatToShowEnum.TRADES]
-        }
-      }
     }
   },
   data() {
@@ -56,7 +46,7 @@ export default {
       hcInstance: null,
       chartOptions: {
         rangeSelector: {
-          selected: 0,
+          selected: 1,
           allButtonsEnabled: true,
           inputDateFormat: '%Y-%m-%d',
           buttons: [
@@ -95,7 +85,7 @@ export default {
             }]
         },
         title: {
-          text: '标题'
+          text: '阿里巴巴'
         },
         xAxis: {
           dateTimeLabelFormats: {
@@ -145,8 +135,7 @@ export default {
           lineWidth: 2
         }],
         series: [{
-          type: 'candlestick',
-          name: '平安银行',
+          name: '阿里巴巴',
           color: 'green',
           lineColor: 'green',
           upColor: 'red',
@@ -174,47 +163,50 @@ export default {
   computed: {
     ...mapState({
       sunClient: state => state.client.sunClient,
-      historicalMktDataMap: state => state.historical_mktdata.historicalMktDataMap,
-      incrementalHistoricalMktDataMap: state => state.historical_mktdata.incrementalHistoricalMktDataMap,
-      initTrack: state => state.historical_mktdata.initTrack,
-      updateTrack: state => state.historical_mktdata.updateTrack
+      tickDataMap: state => state.top_mktdata.tickDataMap,
+      incrementalTickDataMap: state => state.top_mktdata.incrementalTickDataMap,
+      tickDataInitTrace: state => state.top_mktdata.tickDataInitTrace,
+      tickDataUpdateTrace: state => state.top_mktdata.tickDataUpdateTrace
     })
   },
   watch: {
-    initTrack(newValue, oldValue) {
-      const datas = this.historicalMktDataMap.get(this.conId + '_' + this.queryParams.barSize + '_' + this.queryParams.whatToShows)
-      for (const e of datas.values()) {
-        this.hcInstance.series[0].addPoint([e.time, e.open, e.high, e.low, e.close], false)
-        this.hcInstance.series[1].addPoint([e.time, e.volume], false)
+    tickDataInitTrace(newValue, oldValue) {
+      const datas = this.tickDataMap.get(this.conId)
+      for (const entry of datas.entries()) {
+        if (entry[0] === TickTypeEnum.lastPrice) {
+          for (const e of entry[1].entries()) {
+            this.hcInstance.series[0].addPoint([e[0], e[1]], false)
+          }
+        }
       }
       this.hcInstance.redraw()
     },
-    updateTrack(newValue, oldValue) {
-      const datas = this.incrementalHistoricalMktDataMap.get(this.conId + '_' + this.queryParams.barSize + '_' + this.queryParams.whatToShows)
-      console.log(datas)
-      for (const e of datas.entries()) {
-        const val = e[1]
-        this.hcInstance.series[0].addPoint([val.time, val.open, val.high, val.low, val.close], true)
-        this.hcInstance.series[1].addPoint([val.time, val.volume], true)
-        datas.delete(e[0])
+    tickDataUpdateTrace(newValue, oldValue) {
+      const datas = this.incrementalTickDataMap.get(this.conId)
+      for (const entry of datas.entries()) {
+        if (entry[0] === TickTypeEnum.lastPrice) {
+          for (const e of entry[1].entries()) {
+            this.hcInstance.series[0].addPoint([e[0], e[1]])
+            entry[1].delete(e[0])
+            console.log(entry[1])
+          }
+        }
       }
     }
   },
   created() {
     this.conId = parseInt(this.$route.query.conId)
-    console.log(this.queryParams)
     const sendMessage = new PageSubscribeCommand()
     subscribeEvent.forEach((e) => subscribeEventSet.add({ 'action': e, 'primerId': this.conId }))
     sendMessage.actions = Array.from(subscribeEventSet)
     this.sunClient.send(JSON.stringify(sendMessage))
 
-    this.queryParams.whatToShows.forEach((e) => {
-      const sendHistoricalDataMessage = new HistoricalDataCommand()
-      sendHistoricalDataMessage.conId = this.conId
-      sendHistoricalDataMessage.barSize = this.queryParams.barSize
-      sendHistoricalDataMessage.whatToShow = e
-      this.sunClient.send(JSON.stringify(sendHistoricalDataMessage))
-    })
+    const sendTickDataCommand = new TickDataCommand()
+    sendTickDataCommand.conId = this.conId
+    sendTickDataCommand.field = [TickTypeEnum.lastPrice, TickTypeEnum.lastSize]
+    const date = new Date()
+    sendTickDataCommand.occurredBegin = date.getTime() - 8 * 60 * 60 * 1000
+    this.sunClient.send(JSON.stringify(sendTickDataCommand))
   },
   mounted() {
     this.hcInstance = Highcharts.stockChart(this.id, this.chartOptions)
